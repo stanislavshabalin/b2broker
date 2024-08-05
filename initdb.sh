@@ -14,5 +14,5 @@ mysql -h db -u root -proot_password -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%
 echo "Granted all privileges to root"
 
 # Grant CREATE and DROP privileges to the specified user
-mysql -h db -u root -proot_password -e "GRANT CREATE, DROP ON *.* TO '${DB_USER}'@'%'; FLUSH PRIVILEGES;" || { echo "Failed to grant CREATE, DROP privileges to ${DB_USER}"; exit 1; }
-echo "Granted CREATE, DROP privileges to ${DB_USER}"
+mysql -h db -u root -proot_password -e "GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'%'; FLUSH PRIVILEGES;" || { echo "Failed to grant CREATE, DROP privileges to ${DB_USER}"; exit 1; }
+echo "Granted all privileges to ${DB_USER}"
