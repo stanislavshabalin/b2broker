@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  
+  db-init:
+    image: mysql:8.0
+    depends_on:
+      - db
+    volumes:
+      - ./initdb.sh:/initdb.sh
+    entrypoint: ["/initdb.sh"]
+    env_file:
+      - .env
+
+  web:
+    build: .
+    command: bash -c "
+      python /app/src/manage.py migrate &&
+      python /app/src/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - db-init
+    env_file:
+      - .env
+
+  test:
+    build: .
+    working_dir: /app/src
+    command: pytest --ds=b2broker.settings --cov=app
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - db-init
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:
